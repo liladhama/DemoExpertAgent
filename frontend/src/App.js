@@ -1,6 +1,13 @@
+import { useEffect } from 'react';
 import DrevsOnboardingDialog from './components/DrevsOnboardingDialog';
 
 function App() {
+  useEffect(() => {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.expand) {
+      window.Telegram.WebApp.expand();
+    }
+  }, []);
+
   return (
     <div style={{
       height: '100vh',
