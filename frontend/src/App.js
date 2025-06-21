@@ -3,8 +3,10 @@ import DrevsOnboardingDialog from './components/DrevsOnboardingDialog';
 
 function App() {
   return (
-    <div className="App">
-      <DrevsOnboardingDialog />
+    <div className="full-viewport">
+      <div className="App">
+        <DrevsOnboardingDialog />
+      </div>
     </div>
   );
 }
