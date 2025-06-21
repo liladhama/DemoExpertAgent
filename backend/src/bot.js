@@ -11,11 +11,12 @@ const WEBAPP_URL = process.env.WEBAPP_URL || "https://google.com"; // поста
 
 bot.start(async (ctx) => {
   console.log('Получена команда /start от пользователя:', ctx.from.username || ctx.from.id);
+  // Инлайн-кнопка открывает мини-приложение на весь экран
   await ctx.reply(
     'Привет! Я твой помощник. Открой мини-приложение:',
-    Markup.keyboard([
-      [Markup.button.webApp('🚀 Открыть мини-приложение', WEBAPP_URL)]
-    ]).resize()
+    Markup.inlineKeyboard([
+      Markup.button.webApp('🚀 Открыть мини-приложение', WEBAPP_URL)
+    ])
   );
 });
 
