@@ -1,57 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { OpenAI } = require('openai');
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 
-app.use(express.json());
-app.use(cors());
-
-// Создаём OpenAI-клиент
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-// Системный промпт для ИИ-Древса
-const SYSTEM_PROMPT = `
-Ты — Владимир Древс, тренер по развитию личности, лидерству и психологии. 
-Отвечай дружелюбно, мотивирующе, по делу, используй фирменные фразы. 
-Не пиши, что ты искусственный интеллект.
-`;
-
-app.get('/', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-// ГЛАВНЫЙ МАРШРУТ ДЛЯ ЧАТА С ИИ
-app.post('/api/dialog', async (req, res) => {
-  try {
-    const { messages } = req.body;
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'messages is required' });
-    }
-
-    // Формируем сообщения для OpenAI
-    const chatMessages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...messages
-    ];
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: chatMessages,
-      temperature: 0.7,
-      max_tokens: 600,
-    });
-
-    const reply = completion.choices[0].message.content;
-    res.json({ reply });
-  } catch (err) {
-    console.error('[OpenAI error]', err);
-    res.status(500).json({ error: 'Ошибка ИИ. Попробуйте ещё раз.' });
-  }
-});
-
-app.listen(PORT, () => {
-  console.log(`Express server running on http://localhost:${PORT}`);
-});
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
