@@ -14,25 +14,37 @@ export default function DrevsOnboardingDialog({ onComplete }) {
     setInput("");
     setLoading(true);
 
-    // ЗДЕСЬ ДОЛЖЕН БЫТЬ ЗАПРОС К ТВОЕМУ backend/api/dialog
-    // Для MVP можно временно сделать заглушку с таймером
-    setTimeout(() => {
-      // Пример простого ответа
-      const assistantReply = updated.length < 5
-        ? "Спасибо за ответ! Расскажи ещё: что тебе сейчас важнее всего изменить в себе?"
-        : "Спасибо! Я готов составить для тебя индивидуальный план.";
+    try {
+      // --- Заменяем заглушку на реальный запрос ---
+      const resp = await fetch(`${process.env.REACT_APP_BACKEND_URL || ""}/api/dialog`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: updated }),
+      });
+      const data = await resp.json();
+      const assistantReply = data.reply || "Что-то пошло не так, попробуйте ещё раз.";
       setMessages([...updated, { role: "assistant", content: assistantReply }]);
       setLoading(false);
-      if (assistantReply.includes("готов составить план") && onComplete) {
+
+      if (
+        assistantReply.toLowerCase().includes("готов составить план") &&
+        onComplete
+      ) {
         setTimeout(() => onComplete(updated), 1000);
       }
-    }, 1200);
+    } catch (e) {
+      setMessages([
+        ...updated,
+        { role: "assistant", content: "Ошибка соединения. Попробуйте позже." },
+      ]);
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{maxWidth: 500, margin: "40px auto", background: "#fcf7ec", borderRadius: 10, padding: 20, boxShadow: "0 2px 8px #e5e5e5"}}>
+    <div style={{ maxWidth: 500, margin: "40px auto", background: "#fcf7ec", borderRadius: 10, padding: 20, boxShadow: "0 2px 8px #e5e5e5" }}>
       <h2>Диалог с Древсом</h2>
-      <div style={{minHeight: 200, marginBottom: 10}}>
+      <div style={{ minHeight: 200, marginBottom: 10 }}>
         {messages.map((m, i) => (
           <div key={i} style={{
             textAlign: m.role === "assistant" ? "left" : "right",
@@ -43,13 +55,13 @@ export default function DrevsOnboardingDialog({ onComplete }) {
         ))}
         {loading && <div><i>Древс печатает...</i></div>}
       </div>
-      <div style={{display: "flex", gap: 8}}>
+      <div style={{ display: "flex", gap: 8 }}>
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && sendMessage()}
           placeholder="Ваш ответ..."
-          style={{flex: 1, padding: 8}}
+          style={{ flex: 1, padding: 8 }}
         />
         <button onClick={sendMessage} disabled={loading || !input.trim()}>Отправить</button>
       </div>
