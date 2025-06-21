@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-// Новый компонент для кнопок-ответов
+// Компонент кнопок-ответов
 function AnswerOptions({ options, onSelect }) {
   const [showInput, setShowInput] = useState(false);
   const [customValue, setCustomValue] = useState("");
@@ -72,18 +72,27 @@ function AnswerOptions({ options, onSelect }) {
   );
 }
 
-// Функция для попытки выделить варианты ответа из сообщения Древса
+// Функция для поиска вариантов ответа в сообщении
 function extractOptions(message) {
-  // Пример поиска строк "Варианты: ..." или "Варианты ответа: ..."
+  // 1) Поиск по "Варианты: ..."
   const re = /Варианты:?([\s\S]+?)(?:\n|$|Если твой вариант|Если ваш вариант|Если не подходит|Напиши свой|$)/i;
   const match = message.match(re);
   if (match) {
-    // Разбиваем по запятым, точкам с запятой или переводам строк
     return match[1]
       .split(/[,;\n]/)
       .map((v) => v.trim())
       .filter(Boolean)
-      .filter((v) => !/^если/iu.test(v)); // отсеиваем фразы типа "Если твой вариант..."
+      .filter((v) => !/^если/iu.test(v));
+  }
+  // 2) Поиск по перечислениям после "может быть"/"например"/"выбери"/"возможно"
+  const re2 = /(?:может быть|например|выбери|возможно)[^:]*([а-яa-z ,]+)(?:\?|\.|!|$)/i;
+  const match2 = message.match(re2);
+  if (match2) {
+    return match2[1]
+      .split(/[,;]/)
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .filter((v) => v.length > 2 && /^[а-яa-z]/i.test(v));
   }
   return null;
 }
