@@ -7,7 +7,7 @@ console.log('WEBAPP_URL:', process.env.WEBAPP_URL);
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
-const WEBAPP_URL = process.env.WEBAPP_URL || "https://google.com"; // поставь свой фронт
+const WEBAPP_URL = process.env.WEBAPP_URL || "https://demo-expert-agent.vercel.app"; // рабочий фронт
 
 bot.start(async (ctx) => {
   console.log('Получена команда /start от пользователя:', ctx.from.username || ctx.from.id);
